@@ -31,10 +31,13 @@ install: [
 post-messages: ["
 --- Tactician was successfully installed ---
 
-In order to configure Tactician, you should run
+In order to enable Tactician, you should run
 
-tactician configure
+tactician enable
 " {success}]
+setenv: [
+  COQEXTRAFLAGS = "-rifrom Tactician Ltac1.Record"
+]
 url {
   src: "git+https://github.com/coq-tactician/coq-tactician.git#master"
 }

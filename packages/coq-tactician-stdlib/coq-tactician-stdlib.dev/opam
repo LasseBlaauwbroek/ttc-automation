@@ -29,7 +29,7 @@ post-messages: ["
 
 In order to finish the process, you should run
 
-tactician stdlib
+tactician recompile
 " {success}]
 depends: [
   "coq-tactician"
