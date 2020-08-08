@@ -26,7 +26,6 @@ build: [
 ]
 install: [
   [make "install"]
-  [make "install-utility" "OPAM_BIN=%{bin}%"]
 ]
 post-messages: ["
 --- Tactician was successfully installed ---
