@@ -20,8 +20,8 @@ authors: "Lasse Blaauwbroek <lasse@blaauwbroek.eu"
 messages: [
   "*** WARNING ***"
   "This package will overwrite Coq's standard library files."
-  "A backup of the original files will be placed under Coq's library directory at"
-  "user-contrib/tactician-stdlib-backup/"
+  "A backup of the original files will be placed under Coq's"
+  "library directory at user-contrib/tactician-stdlib-backup/"
   "and they will be restored when you remove this package"
 ]
 post-messages: ["
