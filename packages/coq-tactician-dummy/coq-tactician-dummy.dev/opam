@@ -27,7 +27,7 @@ install: [
   [make "install"]
 ]
 url {
-  src: "git+https://github.com/coq-tactician/coq-tactician-dummy.git#master"
+  src: "git+https://github.com/coq-tactician/coq-tactician-dummy.git#8.11"
 }
 tags: [
   "keyword:tactic-learning"
