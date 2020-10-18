@@ -18,7 +18,7 @@ bug-reports: "https://github.com/coq-tactician/coq-tactician/issues"
 maintainer: "Lasse Blaauwbroek <lasse@blaauwbroek.eu>"
 authors: "Lasse Blaauwbroek <lasse@blaauwbroek.eu"
 depends: [
-  "coq" {>= "8.11" & < "8.12~"}
+  "coq" {>= "8.12" & < "8.13~"}
   "coq-tactician-dummy"
 ]
 build: [
