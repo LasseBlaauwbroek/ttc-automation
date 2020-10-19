@@ -17,20 +17,6 @@ dev-repo: "git+https://github.com/coq-tactician/coq-tactician-stdlib"
 bug-reports: "https://github.com/coq-tactician/coq-tactician-stdlib/issues"
 maintainer: "Lasse Blaauwbroek <lasse@blaauwbroek.eu>"
 authors: "Lasse Blaauwbroek <lasse@blaauwbroek.eu"
-messages: [
-  "*** WARNING ***"
-  "This package will overwrite Coq's standard library files."
-  "A backup of the original files will be placed under Coq's"
-  "library directory at user-contrib/tactician-stdlib-backup/"
-  "and they will be restored when you remove this package"
-]
-post-messages: ["
---- The standard library was successfully recompiled ---
-
-In order to finish the process, you should run
-
-tactician recompile
-" {success}]
 depends: [
   "coq-tactician"
 ]

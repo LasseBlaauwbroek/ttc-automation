@@ -27,13 +27,6 @@ build: [
 install: [
   [make "install"]
 ]
-post-messages: ["
---- Tactician was successfully installed ---
-
-In order to enable Tactician, you should run
-
-tactician enable
-" {success}]
 setenv: [
   COQEXTRAFLAGS = "-rifrom Tactician Ltac1.Record"
 ]
