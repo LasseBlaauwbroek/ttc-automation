@@ -38,7 +38,7 @@ setenv: [
   COQEXTRAFLAGS = "-rifrom Tactician Ltac1.Record"
 ]
 url {
-  src: "git+https://github.com/coq-tactician/coq-tactician.git#v8.11"
+  src: "git+https://github.com/coq-tactician/coq-tactician.git#experimental"
 }
 tags: [
   "keyword:tactic-learning"
