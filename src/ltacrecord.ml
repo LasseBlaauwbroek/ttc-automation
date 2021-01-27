@@ -367,7 +367,7 @@ let get_field_goal2 fi gl d =
   | None -> d ()
   | Some x -> x
 
-let warn () = Feedback.msg_warning (Pp.str ("Tactician has uncovered a bug. Please report. "))
+let warn () = () (* Feedback.msg_warning (Pp.str ("Tactician has uncovered a bug. Please report. ")) *)
 
 let set_record b =
   modify_field record_field (fun _ -> b, ()) (fun i -> true)
@@ -894,10 +894,10 @@ let recorder (tac : glob_tactic_expr) id name : unit Proofview.tactic = (* TODO:
       then () else add_to_db2 id (execs, tac);
       try (* This is purely for parsing bug detection and could be removed for performance reasons *)
         let _ = Pcoq.parse_string Pltac.tactic_eoi s in ()
-      with e ->
-        Feedback.msg_warning (Pp.str (
-            "Tactician detected a printing/parsing problem " ^
-            "for the following tactic. Please report. " ^ s)) in
+      with e -> () in
+        (* Feedback.msg_warning (Pp.str (
+         *     "Tactician detected a printing/parsing problem " ^
+         *     "for the following tactic. Please report. " ^ s)) in *)
     List.iter (fun trp -> tryadd trp) db; tclUNIT () in
   let rtac = decompose_annotate tac record_tac_complete in
   let ptac = Tacinterp.eval_tactic rtac in

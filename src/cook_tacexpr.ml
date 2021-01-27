@@ -212,12 +212,12 @@ let tactic_traversable t =
   try
     ignore (cook Names.KNset.empty t); true
   with UnknownWitnessError wit ->
-    Feedback.msg_warning (pr_argument_type wit);
+    (* Feedback.msg_warning (pr_argument_type wit); *)
     false
 
-let warnProblem tacstr =
-  Feedback.msg_warning (Pp.(str "Tactician is having problems with " ++
-                            str "the following tactic. Please report. " ++ tacstr))
+let warnProblem tacstr = ()
+  (* Feedback.msg_warning (Pp.(str "Tactician is having problems with " ++
+   *                           str "the following tactic. Please report. " ++ tacstr)) *)
 
 let discharge env tac =
   if tactic_traversable tac then tac else
@@ -234,7 +234,7 @@ let rebuild s tac =
       let ist = Tacintern.make_empty_glob_sign () in
       Tacintern.intern_tactic_or_tacarg ist raw, true, Names.KNset.empty
      with e ->
-       Feedback.msg_warning (Pp.str (Printexc.to_string e));
+       (* Feedback.msg_warning (Pp.str (Printexc.to_string e)); *)
        warnProblem (Pp.str str); TacId [], false, Names.KNset.empty)
   | _ ->
     try
@@ -245,7 +245,7 @@ let rebuild s tac =
          it must be the case that `discharge` was never executed
          (due to no Ltac's being defined in the section) *)
       (* We can raise a warning about missing witnesses though *)
-      Feedback.msg_warning (pr_argument_type wit);
+      (* Feedback.msg_warning (pr_argument_type wit); *)
       let tacstr = Pptactic.pr_glob_tactic (Global.env ()) tac in
       warnProblem tacstr;
       tac, false, Names.KNset.empty
