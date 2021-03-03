@@ -11,11 +11,12 @@
    naiveknn_learner
    naiveknn_subst_learner
    knnLSHForest
-   lshf_learner
+   lshf_learner_dup
    knn
    tactic_substitute
    search_strategy
    search_strategy_internal
+   learner_helper_dup
    learner_helper
    tactic_learner
    tactic_learner_internal
