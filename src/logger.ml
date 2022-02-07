@@ -9,7 +9,7 @@ let read_whole_file filename =
   close_in ch;
   s
 
-let append file str =
+let append2 file str =
   let oc = open_out_gen [Open_creat; Open_text; Open_append] 0o640 file in
   output_string oc str;
   close_out oc
@@ -40,13 +40,18 @@ let feedbackdir () =
 let unprocessed_file () =
   feedbackdir () ^ "unprocessed"
 
+let file_lock = Mutex.create ()
+
+let append str =
+  CThread.with_lock file_lock ~scope:(fun () -> append2 (unprocessed_file ()) str)
+
 let uid =
   let uid = lazy (
     Random.self_init ();
     let uid_file_name = feedbackdir () ^ "uid" in
     let gen_uid () =
       let uid_str = Int64.to_string (Random.int64 (Int64.max_int)) in
-      append uid_file_name uid_str; uid_str in
+      append2 uid_file_name uid_str; uid_str in
     if Sys.file_exists uid_file_name then
       let uid = read_whole_file uid_file_name in
       if String.length uid = 0 then
@@ -103,8 +108,13 @@ let read_and_truncate file =
   close_out oc;
   !lines
 
+let read_and_truncate () =
+  CThread.with_lock file_lock ~scope:(fun () ->
+      read_and_truncate (unprocessed_file ()))
+
 (* Hope and pray that other processes don't interfere with our reading and writing *)
-(* TODO: There must be a better way to do this *)
+(* The mutex at least prevents us from reading the file concurrently withing the current process *)
+(* TODO: Prevent concurrent reading/writing to the log file using a lock file *)
 let log_thread = ref None
 let upload_unprocessed () =
   match !log_thread with
@@ -113,11 +123,11 @@ let upload_unprocessed () =
         Fun.protect ~finally:(fun () -> log_thread := None) @@ fun () ->
         let _ = Thread.sigmask Unix.SIG_BLOCK [Sys.sigint] in
         log_thread := Some (Thread.self ());
-        let logs = ref (read_and_truncate (unprocessed_file ())) in
+        let logs = ref (read_and_truncate ()) in
         while not (!logs = []) do
           let res = send_log (List.hd !logs) in
           if res then logs := List.tl !logs else
-            (List.iter (fun line -> append (unprocessed_file ()) (line ^ "\n")) !logs; logs := [])
+            (List.iter (fun line -> append (line ^ "\n")) !logs; logs := [])
         done;
       ) ())
   | Some _ -> ()
@@ -222,7 +232,7 @@ let solved_logger env trace count witness =
         Node [s2s "trace"; Node (List.map (fun i -> s2s (string_of_int i)) trace)];
         Node [s2s "witness"; Node witness]
       ]) in
-    append (unprocessed_file ()) (sexpr_to_string full_info ^ "\n"));
+    append (sexpr_to_string full_info ^ "\n"));
   pre_info := None;
   upload_unprocessed ();
   tclUNIT ()
@@ -236,7 +246,7 @@ let failed_logger () =
          Node [s2s "status"; s2s "unsolved"];
          Node [s2s "after_time"; s2s (string_of_float time)];
        ]) in
-     append (unprocessed_file ()) (sexpr_to_string full_info ^ "\n"));
+     append (sexpr_to_string full_info ^ "\n"));
   pre_info := None;
   upload_unprocessed ();
   tclUNIT ()
@@ -250,7 +260,7 @@ let aborted_logger () =
          Node [s2s "status"; s2s "aborted"];
          Node [s2s "after_time"; s2s (string_of_float time)];
        ]) in
-     append (unprocessed_file ()) (sexpr_to_string full_info ^ "\n");
+     append (sexpr_to_string full_info ^ "\n");
      upload_unprocessed ()
   );
   pre_info := None; ()
@@ -263,7 +273,7 @@ let suggest_logger env preds trace_getter db_size =
   let preds = Node [Node ((s2s "predictions") :: preds)] in
   let log_type = Node [Node [s2s "logtype"; s2s "suggest"]] in
   common_info trace_getter db_size >>= fun full_info ->
-  append (unprocessed_file ()) (sexpr_to_string (sexpr_concat (sexpr_concat log_type full_info) preds) ^ "\n");
+  append (sexpr_to_string (sexpr_concat (sexpr_concat log_type full_info) preds) ^ "\n");
   upload_unprocessed ();
   tclUNIT ()
 
