@@ -109,16 +109,17 @@ let log_thread = ref None
 let upload_unprocessed () =
   match !log_thread with
   | None ->
-    let thread = Thread.create (fun () ->
+    ignore (Thread.create (fun () ->
+        Fun.protect ~finally:(fun () -> log_thread := None) @@ fun () ->
+        let _ = Thread.sigmask Unix.SIG_BLOCK [Sys.sigint] in
+        log_thread := Some (Thread.self ());
         let logs = ref (read_and_truncate (unprocessed_file ())) in
         while not (!logs = []) do
           let res = send_log (List.hd !logs) in
           if res then logs := List.tl !logs else
             (List.iter (fun line -> append (unprocessed_file ()) (line ^ "\n")) !logs; logs := [])
         done;
-        log_thread := None
-      ) () in
-    log_thread := Some thread
+      ) ())
   | Some _ -> ()
 
 let record_map (f : Proofview.Goal.t -> 'a)
