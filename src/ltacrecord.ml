@@ -762,11 +762,11 @@ let push_nested_search_solutions tcs =
   modify_field nested_search_solutions_field (fun acc -> tcs :: acc, ()) (fun () -> [])
 let empty_nested_search_solutions () =
   modify_field nested_search_solutions_field (fun acc -> [], acc) (fun () -> [])
-let userSearch =
+let userSearch log_type =
     let open Proofview in
     let open Notations in
     get_search_recursion_depth () >>= fun nlogger ->
-    if nlogger >= 1 then tclUNIT () else Logger.pre_logger get_tactic_trace !db_size >>=
+    if nlogger >= 1 then tclUNIT () else Logger.pre_logger log_type get_tactic_trace !db_size >>=
       fun () -> tclORELSE
         (commonSearch None >>= fun (wit, count) -> get_search_recursion_depth () >>= fun n ->
          let tcs, tr = List.split (List.map (fun {tac;focus;prediction_index} ->
@@ -964,3 +964,14 @@ let tactician_ignore t =
   let open Notations in
   get_record () >>= fun b ->
   set_record false <*> t <*> set_record b
+
+let tactician_log log_type t =
+  let open Proofview in
+  let open Notations in
+  get_search_recursion_depth () >>= fun nlogger ->
+  if nlogger >= 1 then tclUNIT () else Logger.pre_logger log_type get_tactic_trace !db_size >>=
+    fun () -> tclORELSE
+    (t >>= fun () ->
+     tclENV >>= fun env ->
+     Logger.solved_logger env [] 0 [])
+    (fun (e, i) -> Logger.failed_logger () <*> tclZERO ~info:i e)

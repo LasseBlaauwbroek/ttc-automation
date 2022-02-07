@@ -209,9 +209,9 @@ let common_info trace_getter db_size =
   tclUNIT full_info
 
 let pre_info = ref None
-let pre_logger trace_getter db_size =
+let pre_logger log_type trace_getter db_size =
   let open Notations in
-  let log_type = Node [Node [s2s "logtype"; s2s "search"]] in
+  let log_type = Node [Node [s2s "logtype"; s2s log_type]] in
   common_info trace_getter db_size >>= fun full_info ->
   pre_info := Some (sexpr_concat log_type full_info);
   tclUNIT ()

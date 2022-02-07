@@ -4,6 +4,7 @@ DECLARE PLUGIN "tactician_ltac1_tactics_plugin"
 
 open Ltac_plugin
 open Tacarg
+open Stdarg
 
 let () = Tactician_ltac1_record_plugin.Tactic_learner_internal.disable_queue ()
 
@@ -15,7 +16,13 @@ TACTIC EXTEND tacticianignore
 END
 
 TACTIC EXTEND synth
-| [ "ml_synth" ] ->   { Tactician_ltac1_record_plugin.Ltacrecord.userSearch }
+| [ "ml_synth" ] ->   { Tactician_ltac1_record_plugin.Ltacrecord.userSearch "search" }
+| [ "ml_synth_background" ] ->   { Tactician_ltac1_record_plugin.Ltacrecord.userSearch "search_background" }
+END
+
+TACTIC EXTEND tactician_log
+| [ "tactician_log" string(str) tactic(t) ] ->
+  { Tactician_ltac1_record_plugin.Ltacrecord.tactician_log str (Tacinterp.tactic_of_value ist t) }
 END
 
 VERNAC COMMAND EXTEND TacticianSuggest CLASSIFIED AS QUERY STATE proof_query
