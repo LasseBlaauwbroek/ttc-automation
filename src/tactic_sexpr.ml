@@ -114,7 +114,7 @@ let gen_atomic_tactic_expr_name (tac : 'a gen_atomic_tactic_expr) = match tac wi
   | TacRewrite (_, _, _, _) -> ["TacRewrite"]
   | TacInversion (_, _) -> ["TacInversion"]
 
-let gen_tactic_expr_name r (tac : 'a gen_tactic_expr) = match tac with
+let gen_tactic_expr_r_name r (tac : 'a gen_tactic_expr_r) = match tac with
   | TacAtom _ -> [s2s "TacAtom"]
   | TacThen (_, _) -> [s2s "TacThen"]
   | TacDispatch _ -> [s2s "TacDispatch"]
@@ -146,7 +146,7 @@ let gen_tactic_expr_name r (tac : 'a gen_tactic_expr) = match tac with
   | TacArg _ -> [s2s "TacArg"]
   | TacSelect (_, _) -> [s2s "TacSelect"]
   | TacML _ -> [s2s "TacML"]
-  | TacAlias CAst.{v=(c, _); _} ->
+  | TacAlias (c, _) ->
     let al = Tacenv.interp_alias c in
     [s2s "TacAlias"; s2s @@ Names.KerName.debug_to_string c; r al.alias_body]
 
@@ -171,10 +171,10 @@ type 'a k = 'a SexprDef.t
 let mapper r =
   { SexprDef.default_mapper with
     glob_tactic = (fun t g ->
-        let name = gen_tactic_expr_name r t in
+        let name = gen_tactic_expr_r_name r t in
         M.censor (fun ls -> [Node (name @ ls)]) (g t))
   ; raw_tactic = (fun t g ->
-        let name = gen_tactic_expr_name r t in
+        let name = gen_tactic_expr_r_name r t in
         M.censor (fun ls -> [Node (name @ ls)]) (g t))
   ; glob_tactic_arg = (fun t g ->
         let name = glob_tactic_arg_name t in
