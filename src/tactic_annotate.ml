@@ -48,14 +48,18 @@ let decompose_annotate (tac : glob_tactic_expr) (r : glob_tactic_expr -> glob_ta
     r t t in
   let tacthenfirst t1 t2 = TacThens3parts (t1, Array.of_list [t2], TacId [], Array.of_list []) in
   let tacthenlast  t1 t2 = TacThens3parts (t1, Array.of_list [], TacId [], Array.of_list [t2]) in
-  let decompose_apply flg1 flg2 intro loc (ls : 'trm with_bindings_arg list) =
-    let intro' = Option.map (fun (n, _) -> (n, None)) intro in
-    let combiner = match intro with | None -> tacthenlast | Some _ -> tacthenfirst in
-    let rec aux = function
+  let decompose_apply flg1 flg2 intros loc (ls : 'trm with_bindings_arg list) =
+    let no_intro intro = match intro with | [] -> [] | [n, _] -> [n, None] | _ -> assert false in
+    let combiner intro = match intro with | [] -> tacthenlast | _::_ -> tacthenfirst in
+    let rec apps intro = function
       | [] -> assert false
       | [s] -> mkatom loc (TacApply (flg1, flg2, [s], intro))
-      | s::ls -> combiner (mkatom loc (TacApply (flg1, flg2, [s], intro'))) (aux ls)
-    in aux ls in
+      | s::ls -> combiner intro (mkatom loc (TacApply (flg1, flg2, [s], no_intro intro))) (apps intro ls) in
+    let rec ins = function
+      | [] -> apps [] ls
+      | [intro] -> apps [intro] ls
+      | intro::intros -> tacthenfirst (apps [intro] ls) (ins intros) in
+    ins intros in
   let decompose_generalize loc ls =
     let rec aux = function
       | [] -> assert false
@@ -173,7 +177,6 @@ let decompose_annotate (tac : glob_tactic_expr) (r : glob_tactic_expr -> glob_ta
     | TacAbstract (t, id) ->               router Abstract (TacAbstract (rinner Abstract t, id))
     | TacId _           ->                 tac (* No need to record id *)
     | TacFail _         ->                 tac (* No need to record fail *)
-    | TacInfo t         ->                 TacInfo (annotate t) (* No need to record info *)
     | TacLetIn (flg, ts, t) ->
       let ts = if inner_record LetIn then List.map (fun (a, b) -> (a, fst (annotate_arg b))) ts else ts in
       router LetIn (TacLetIn (flg, ts, rinner LetIn t))

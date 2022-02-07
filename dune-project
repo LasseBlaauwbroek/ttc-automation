@@ -28,7 +28,7 @@ automation.")
     (dune-site (>= 2.9.1))
     (opam-client (>= 2.1.0))
     cmdliner
-    (coq (and (>= 8.12) (< 8.13~)))
+    (coq (and (>= 8.13) (< 8.14~)))
     conf-git
     (bos (>= 0.2.1))
     (coq-tactician-dummy (and (= dev) :with-test))))

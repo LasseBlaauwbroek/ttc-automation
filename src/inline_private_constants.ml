@@ -36,7 +36,7 @@ let inline_tactic env t =
   let rec glob_term_inline c = match DAst.get c with
     | GRef (ConstRef const, _) ->
       if Environ.mem_constant const env then c else
-        DAst.make @@ GEvar (Names.Id.of_string "private_constant_placeholder", [])
+        DAst.make @@ GEvar (CAst.make (Names.Id.of_string "private_constant_placeholder"), [])
     | _ -> Glob_ops.map_glob_constr glob_term_inline c in
 
   (* We prefer to replace private constant with an evar, but if that is not possible, we replace it

@@ -51,7 +51,7 @@ let _ = register_generic_map wit_ident (module struct
     end
   end)
 
-let _ = register_generic_map wit_var (module struct
+let _ = register_generic_map wit_hyp (module struct
     type raw = lident
     type glob = lident
     module M = functor (M : MapDef) -> struct
@@ -112,6 +112,16 @@ let _ = register_generic_map wit_quant_hyp (module struct
   end)
 
 let _ = register_generic_map wit_int_or_var (module struct
+    type raw = int or_var
+    type glob = int or_var
+    module M = functor (M : MapDef) -> struct
+      open M
+      let raw_map m = m.or_var_map id
+      let glob_map m = m.or_var_map id
+    end
+  end)
+
+let _ = register_generic_map wit_nat_or_var (module struct
     type raw = int or_var
     type glob = int or_var
     module M = functor (M : MapDef) -> struct

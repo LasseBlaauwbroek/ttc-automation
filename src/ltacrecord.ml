@@ -547,11 +547,11 @@ let print_goal_short = Proofview.Goal.enter
 
 let synthesize_tactic (env : Environ.env) tcs =
   let tac_pp t = Sexpr.format_oneline (Pptactic.pr_glob_tactic env t) in
-  Pp.(h 0 (str "synth" ++ ws 1 ++ str "with" ++ ws 1 ++ str "cache" ++ ws 1 ++
-           Pp.str "(" ++ (prlist_with_sep
-                            (fun () -> str "; ")
-                            (fun (t, i) -> str "only" ++ ws 1 ++ int (1+i) ++ str ":" ++ ws 1 ++ tac_pp t)
-                            (Stdlib.List.rev tcs)) ++ str (").")))
+  Pp.(h (str "synth" ++ ws 1 ++ str "with" ++ ws 1 ++ str "cache" ++ ws 1 ++
+         Pp.str "(" ++ (prlist_with_sep
+                          (fun () -> str "; ")
+                          (fun (t, i) -> str "only" ++ ws 1 ++ int (1+i) ++ str ":" ++ ws 1 ++ tac_pp t)
+                          (Stdlib.List.rev tcs)) ++ str (").")))
 
 type witness_elem =
   { tac : glob_tactic_expr
@@ -709,13 +709,12 @@ let commonSearch max_exec =
     if n >= max_recursion_depth then Tacticals.New.tclZEROMSG (Pp.str "too much search nesting") else
       tacpredict max_reached >>= fun predict ->
       tclLIFT (NonLogical.make (fun () -> CWarnings.get_flags ())) >>= (fun oldFlags ->
-          (* TODO: Find a way to reset dumbglob to original value. This is a temporary hack. *)
           let doFlags = n = 0 in
           let setFlags () = if not doFlags then tclUNIT () else tclLIFT (NonLogical.make (fun () ->
-              Dumpglob.continue (); CWarnings.set_flags (oldFlags))) in
+              Dumpglob.pop_output (); CWarnings.set_flags (oldFlags))) in
           (if not doFlags then tclUNIT () else
              tclLIFT (NonLogical.make (fun () ->
-                 tac_exec_count := 0; Dumpglob.pause(); CWarnings.set_flags ("-all"))))
+                 tac_exec_count := 0; Dumpglob.pause (); CWarnings.set_flags ("-all"))))
           <*> tclOR
             (tclONCE (Tacticals.New.tclCOMPLETE (search_with_strategy max_reached predict)) <*>
              get_witness () >>= fun wit -> empty_witness () <*>
@@ -900,7 +899,7 @@ let () = register ml_push_state_tac "pushstatetac"
 let run_record_tac (tac : glob_tactic_expr) : glob_tactic_expr =
   let enc = Genarg.in_gen (Genarg.glbwit wit_glbtactic) tac in
   TacML (CAst.make ({mltac_name = {mltac_plugin = "recording"; mltac_tactic = "recordtac"}; mltac_index = 0},
-                    [TacGeneric enc]))
+                    [TacGeneric (None, enc)]))
 
 let run_pushs_state_tac (): glob_tactic_expr =
   (*let tac_glob = Tacintern.intern_pure_tactic*)
@@ -941,16 +940,14 @@ let recorder (tac : glob_tactic_expr) id name : unit Proofview.tactic = (* TODO:
   | None -> ptac
   | Some _ -> benchmarkSearch path <*> ptac
 
-let hide_interp_t global t ot id name =
+let hide_interp_t (global, t, id, name) =
   let open Proofview in
   let open Notations in
   let hide_interp env =
     let ist = Genintern.empty_glob_sign env in
     let te = Tacintern.intern_pure_tactic ist t in
     let t = recorder te id name in
-    match ot with
-    | None -> t
-    | Some t' -> Tacticals.New.tclTHEN t t'
+    t
   in
   if global then
     Proofview.tclENV >>= fun env ->
@@ -959,6 +956,8 @@ let hide_interp_t global t ot id name =
     Proofview.Goal.enter begin fun gl ->
       hide_interp (Proofview.Goal.env gl)
     end
+
+let ComTactic.Interpreter hide_interp_t = ComTactic.register_tactic_interpreter "tactician-ltac1" hide_interp_t
 
 let tactician_ignore t =
   let open Proofview in

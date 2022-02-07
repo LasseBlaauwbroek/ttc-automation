@@ -28,6 +28,7 @@ let constr_pattern_name (pat : constr_pattern) = match pat with
   | PCoFix (_, _) -> ["PCoFix"]
   | PInt _ -> ["PInt"]
   | PFloat _ -> ["PFloat"]
+  | PArray (_, _, _) -> ["PArray"]
 
 let constr_expr_r_name (expr : constr_expr_r) = match expr with
   | CRef (_, _) -> ["CRef"]
@@ -51,6 +52,7 @@ let constr_expr_r_name (expr : constr_expr_r) = match expr with
   | CGeneralization (_, _, _) -> ["CGeneralization"]
   | CPrim _ -> ["CPrim"]
   | CDelimiters (_, _) -> ["CDelimiters"]
+  | CArray (_, _, _, _) -> ["CArray"]
 
 let glob_constr_r_name (expr : 'a glob_constr_r) = match expr with
   | GRef (_, _) -> ["GRef"]
@@ -70,6 +72,7 @@ let glob_constr_r_name (expr : 'a glob_constr_r) = match expr with
   | GCast (_, _) -> ["GCast"]
   | GInt _ -> ["GInt"]
   | GFloat _ -> ["GFloat"]
+  | GArray (_, _, _, _) -> ["GArray"]
 
 let gen_tactic_arg_name (arg : 'a gen_tactic_arg) = match arg with
   | TacGeneric _ -> ["TacGeneric"]
@@ -136,7 +139,6 @@ let gen_tactic_expr_name r (tac : 'a gen_tactic_expr) = match tac with
   | TacAbstract (_, _) -> [s2s "TacAbstract"]
   | TacId _ -> [s2s "TacId"]
   | TacFail (_, _, _) -> [s2s "TacFail"]
-  | TacInfo _ -> [s2s "TacInfo"]
   | TacLetIn (_, _, _) -> [s2s "TacLetIn"]
   | TacMatch (_, _, _) -> [s2s "TacMatch"]
   | TacMatchGoal (_, _, _) -> [s2s "TacMatchGoal"]
