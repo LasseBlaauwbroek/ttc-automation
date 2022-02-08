@@ -37,16 +37,16 @@
  (module coq_shim)
  (sites coq-tactician) (sourceroot))
 
-(executable
- (name tactician)
- (package coq-tactician)
- (public_name tactician)
- (flags :standard -warn-error -A)
- (modules ("tactician") coq_shim)
- (libraries
-   unix
-   opam-client
-   dune-site
-   bos
- )
-)
+; (executable
+;  (name tactician)
+;  (package coq-tactician)
+;  (public_name tactician)
+;  (flags :standard -warn-error -A)
+;  (modules ("tactician") coq_shim)
+;  (libraries
+;    unix
+;    opam-client
+;    dune-site
+;    bos
+;  )
+; )
