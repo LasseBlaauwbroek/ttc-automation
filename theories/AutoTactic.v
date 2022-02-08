@@ -1,3 +1,4 @@
-From Tactician Require Export Ltac1.
+From Tactician Require Export Ltac1.Record.
+From Tactician Require Export Ltac1.Tactics.
 Require Export Lia.
-Automatic Tactics Thread (try timeout 60 (ml_synth_background)).
+Automatic Tactics Thread (timeout 60 (try ml_synth_background)).

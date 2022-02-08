@@ -121,7 +121,9 @@ let upload_unprocessed () =
   | None ->
     ignore (Thread.create (fun () ->
         Fun.protect ~finally:(fun () -> log_thread := None) @@ fun () ->
-        let _ = Thread.sigmask Unix.SIG_BLOCK [Sys.sigint] in
+        (try
+           ignore (Thread.sigmask Unix.SIG_BLOCK [Sys.sigalrm; Sys.sigint])
+         with _ -> ());
         log_thread := Some (Thread.self ());
         let logs = ref (read_and_truncate ()) in
         while not (!logs = []) do
@@ -264,6 +266,8 @@ let aborted_logger () =
      upload_unprocessed ()
   );
   pre_info := None; ()
+
+let () = Hook.set Autotac_thread.logger_hook aborted_logger
 
 let suggest_logger env preds trace_getter db_size =
   let open Notations in
