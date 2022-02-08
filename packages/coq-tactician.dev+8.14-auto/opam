@@ -16,15 +16,18 @@ homepage: "https://coq-tactician.github.io"
 bug-reports: "https://github.com/coq-tactician/coq-tactician/issues"
 depends: [
   "ocaml" {>= "4.08"}
-  "dune" {>= "2.5" & build}
+  "dune" {>= "2.8"}
+  "dune-site" {>= "2.9.1"}
   "opam-client" {>= "2.1.0~beta2"}
   "cmdliner"
-  "coq" {>= "8.12" & < "8.13~"}
+  "coq" {= "8.14.dev-auto"}
   "conf-git"
-  "coq-tactician-dummy" {= "1.0~beta1" & with-test}
+  "bos" {>= "0.2.1"}
+  "coq-tactician-dummy" {= "dev" & with-test}
+  "odoc" {with-doc}
 ]
 build: [
-  ["dune" "subst"] {pinned}
+  ["dune" "subst"] {dev}
   [
     "dune"
     "build"
@@ -37,9 +40,7 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-url {
-  src: "git+https://github.com/LasseBlaauwbroek/ttc-automation.git#ttc-feedback"
-}
+dev-repo: "git+https://github.com/coq-tactician/coq-tactician.git"
 post-messages: ["
 --- Tactician was successfully installed ---
 
@@ -55,3 +56,10 @@ tags: [
   "category:Miscellaneous/Coq Extensions"
   "logpath:Tactician"
 ]
+substs: [
+  "coq-shim/tactician-patch"
+  "coq-shim/tactician.ml"
+]
+url {
+  src: "git+https://github.com/coq-tactician/coq-tactician.git#coq8.14"
+}
