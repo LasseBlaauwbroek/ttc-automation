@@ -46,5 +46,5 @@ install: [
 ]
 
 url {
-  src: "git+https://github.com/LasseBlaauwbroek/coq.git#autotactic"
+  src: "git+https://github.com/LasseBlaauwbroek/coq.git#autotactic-pwca"
 }

@@ -61,5 +61,5 @@ substs: [
   "coq-shim/tactician.ml"
 ]
 url {
-  src: "git+https://github.com/coq-tactician/coq-tactician.git#coq8.14"
+  src: "git+https://github.com/LasseBlaauwbroek/ttc-automation.git#ttc-feedback"
 }
