@@ -38,13 +38,6 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/coq-tactician/coq-tactician.git"
-post-messages: ["
---- Tactician was successfully installed ---
-
-In order to enable Tactician, you should run
-
-tactician enable
-" {success}]
 tags: [
   "keyword:tactic-learning"
   "keyword:machine-learning"
