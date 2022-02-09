@@ -765,6 +765,10 @@ let empty_nested_search_solutions () =
 let userSearch log_type =
     let open Proofview in
     let open Notations in
+    let enable_feedback () =
+      let time = Unix.time () in
+      (not @@ String.equal log_type "search_background") ||
+      time >= 1647471600. in
     get_search_recursion_depth () >>= fun nlogger ->
     if nlogger >= 1 then tclUNIT () else Logger.pre_logger log_type get_tactic_trace !db_size >>=
       fun () -> tclORELSE
@@ -779,7 +783,9 @@ let userSearch log_type =
            let acc_msg = if List.is_empty acc then Pp.mt () else
                Pp.(str ("\n\nThe tactic above uses nested searching. The following tactics cache those nested searches.\n") ++
                    (prlist_with_sep fnl (synthesize_tactic env) acc)) in
-           tclLIFT (NonLogical.print_info (Pp.(main_msg ++ acc_msg))))
+           if enable_feedback () then
+             tclLIFT (NonLogical.print_info (Pp.(main_msg ++ acc_msg)))
+           else tclUNIT ())
         (fun (e, i) -> Logger.failed_logger () <*> tclZERO ~info:i e)
 
 (* Name globalization *)
